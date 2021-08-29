@@ -205,117 +205,58 @@ function patientSearch() {
         }
       },
 
-      // Display 'Failed to read Patients from FHIR server' if the call failed
-      function() {
-        clearPatientUI();
-        $('#patient-errors').html('<p>Failed to read Patients from FHIR server</p>');
-        $('#patient-errors-row').show();
-      }
-    );
-  });
-}
+      $('#clear-appointment').on('click', function(e) {
+  $('#appointment').html('');
+  $('#appointment-holder-row').hide();
+});
 
-function patientHTML(slotReference, patientId, patientName) {
-  console.log('Patient: name:[' + patientName + ']');
+function appointmentCreate(slotReference, patientReference) {
+  clearUI();
+  $('#loading-row').show();
 
-  var patientReference = 'Patient/' + patientId;
-
-  return "<div class='card'>" +
-           "<div class='card-body'>" +
-             "<h5 class='card-title'>" + patientName + '</h5>' +
-             "<a href='javascript:void(0);' class='card-link' onclick='appointmentCreate(\"" +
-               slotReference + '", "' + patientReference + "\");'>Use Patient</a>" +
-           '</div>' +
-         '</div>';
-}
-
-function patientCreate() {
-  clearPatientUI();
-  $('#patient-loading-row').show();
-
-  // Grab Patient POST body attributes from the patient-create-form
-  var form = document.getElementById('patient-create-form');
-
-  var patientBody = patientJSON(
-    form.elements['patient-create-firstname'].value,
-    form.elements['patient-create-middlename'].value,
-    form.elements['patient-create-lastname'].value,
-    form.elements['patient-create-phone'].value,
-    form.elements['patient-create-male'].checked ? 'male' : 'female',
-    form.elements['patient-create-birthdate'].value
-  );
+  var appointmentBody = appointmentJSON(slotReference, patientReference);
 
   // FHIR.oauth2.ready handles refreshing access tokens
   FHIR.oauth2.ready(function(smart) {
-    smart.api.create({resource: patientBody}).then(
+    smart.api.create({resource: appointmentBody}).then(
 
-      // Display Patient information if the call succeeded
-      function(patient) {
-        $('#patient-loading-row').hide();
-        form.reset();
-        alert('Created Patient ' + patient.headers('Location').match(/\d+$/)[0] + '\n\nSearch for them by name.');
+      // Display Appointment information if the call succeeded
+      function(appointment) {
+        renderAppointment(appointment.headers('Location'));
       },
 
-      // Display 'Failed to write Patient to FHIR server' if the call failed
+      // Display 'Failed to write Appointment to FHIR server' if the call failed
       function() {
-        $('#patient-loading-row').hide();
-        alert('Failed to write Patient to FHIR server');
+        clearUI();
+        $('#errors').html('<p>Failed to write Appointment to FHIR server</p>');
+        $('#errors-row').show();
       }
     );
   });
 }
 
-function patientJSON(firstName, middleName, lastName, phone, gender, birthDate) {
-  var periodStart = new Date().toISOString();
-
+function appointmentJSON(slotReference, patientReference) {
   return {
-    resourceType: 'Patient',
-    identifier: [
+    resourceType: 'Appointment',
+    slot: [
       {
-        assigner: {
-          reference: 'Organization/675844'
-        }
+        reference: slotReference
       }
     ],
-    active: true,
-    name: [
+    participant: [
       {
-        use: 'official',
-        family: [
-          lastName
-        ],
-        given: [
-          firstName,
-          middleName
-        ],
-        period: {
-          start: periodStart
-        }
+        actor: {
+          reference: patientReference
+        },
+        status: 'needs-action'
       }
     ],
-    telecom: [
-      {
-        system: 'phone',
-        value: phone,
-        use: 'home'
-      }
-    ],
-    gender: gender,
-    birthDate: birthDate
+    status: 'proposed'
   };
 }
 
-function renderPatients(patientsHTML) {
-  clearPatientUI();
-  $('#patients').html(patientsHTML);
-  $('#patients-holder-row').show();
+function renderAppointment(appointmentLocation) {
+  clearUI();
+  $('#appointment').html('<p>Created Appointment ' + appointmentLocation.match(/\d+$/)[0] + '</p>');
+  $('#appointment-holder-row').show();
 }
-
-function clearPatientUI() {
-  $('#patient-errors').html('');
-  $('#patient-errors-row').hide();
-  $('#patient-loading-row').hide();
-  $('#patients').html('');
-  $('#patients-holder-row').hide();
-}
-;
