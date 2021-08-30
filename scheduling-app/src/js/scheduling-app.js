@@ -55,6 +55,7 @@ console.log ("FHIR.oauth2");
       }
     );
   });
+  console.log ("FHIR.oauth2.done");
 }
 
 function slotHTML(id, type, start, end) {
