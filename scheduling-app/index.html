@@ -138,36 +138,7 @@
         </div>
       </div>
 
-  $('#clear-appointment').on('click', function(e) {
-  $('#appointment').html('');
-  $('#appointment-holder-row').hide();
-});
 
-function appointmentJSON(slotReference, patientReference) {
-  return {
-    resourceType: 'Appointment',
-    slot: [
-      {
-        reference: slotReference
-      }
-    ],
-    participant: [
-      {
-        actor: {
-          reference: patientReference
-        },
-        status: 'needs-action'
-      }
-    ],
-    status: 'proposed'
-  };
-}
-
-function renderAppointment(appointmentLocation) {
-  clearUI();
-  $('#appointment').html('<p>Created Appointment ' + appointmentLocation.match(/\d+$/)[0] + '</p>');
-  $('#appointment-holder-row').show();
-}
       <!-- Required JS files to enable this page to embed within an MPage -->
       <script src='https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.min.js'></script>
       <script src='./lib/js/cerner-smart-embeddable-lib-1.0.0.min.js'></script>
