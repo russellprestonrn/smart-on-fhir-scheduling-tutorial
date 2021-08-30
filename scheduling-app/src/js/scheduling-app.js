@@ -50,7 +50,7 @@ function slotSearch() {
         clearUI();
         $('#errors').html('<p>Failed to read Slots from FHIR server</p>');
         $('#errors-row').show();
-      }
+      }.then(console.log)
     );
   });
 }
