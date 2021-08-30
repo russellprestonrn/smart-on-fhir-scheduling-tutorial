@@ -208,7 +208,7 @@ function patientSearch() {
       $('#clear-appointment').on('click', function(e) {
   $('#appointment').html('');
   $('#appointment-holder-row').hide();
-});
+}));
 
 function appointmentCreate(slotReference, patientReference) {
   clearUI();
