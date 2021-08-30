@@ -259,5 +259,6 @@ function renderAppointment(appointmentLocation) {
   clearUI();
   $('#appointment').html('<p>Created Appointment ' + appointmentLocation.match(/\d+$/)[0] + '</p>');
   $('#appointment-holder-row').show();
-}
+});
+    
   
